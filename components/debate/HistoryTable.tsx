@@ -7,9 +7,9 @@ import { CATEGORY_LABEL, VERDICT_LABEL } from "@/lib/types/debate";
 import type { DebateCategory, DebateSession } from "@/lib/types/debate";
 
 const VERDICT_STYLE: Record<NonNullable<DebateSession["verdict"]>, { bg: string; text: string; dot: string }> = {
-  bull: { bg: "bg-[#10B981]/10 border-[#10B981]/20", text: "text-[#10B981]", dot: "bg-[#10B981]" },
-  bear: { bg: "bg-[#EF4444]/10 border-[#EF4444]/20", text: "text-[#EF4444]", dot: "bg-[#EF4444]" },
-  neutral: { bg: "bg-[#8C909F]/10 border-[#8C909F]/20", text: "text-[#8C909F]", dot: "bg-[#8C909F]" },
+  bull: { bg: "bg-positive/10 border-positive/20", text: "text-positive", dot: "bg-positive" },
+  bear: { bg: "bg-negative/10 border-negative/20", text: "text-negative", dot: "bg-negative" },
+  neutral: { bg: "bg-neutral/10 border-neutral/20", text: "text-neutral", dot: "bg-neutral" },
 };
 
 const FILTERS: (DebateCategory | "all")[] = ["all", "market", "financial", "technical", "macro", "synthesis"];
@@ -53,7 +53,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#334155] pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-card-border pb-6">
         <div>
           <h2 className="text-headline-lg text-on-surface mb-2">리포트 히스토리</h2>
           <p className="text-body-md text-on-surface-variant">저장된 AI 토론 분석 결과 및 리포트 목록입니다.</p>
@@ -67,7 +67,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="종목명 또는 카테고리 검색..."
-            className="w-full bg-[#0F172A] border border-[#334155] rounded-lg pl-10 pr-4 py-2 text-body-sm text-on-surface focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
+            className="w-full bg-canvas-bg border border-card-border rounded-lg pl-10 pr-4 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary-btn focus:ring-1 focus:ring-primary-btn"
           />
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
               className={`px-4 py-1.5 rounded-full text-label-md border transition-colors ${
                 active
                   ? "bg-primary/20 text-primary border-primary/30"
-                  : "bg-surface-container text-on-surface-variant border-[#334155] hover:bg-surface-variant/50"
+                  : "bg-surface-container text-on-surface-variant border-card-border hover:bg-surface-variant/50"
               }`}
             >
               {c === "all" ? "전체" : CATEGORY_LABEL[c]}
@@ -93,16 +93,16 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
       </div>
 
       {visible.length === 0 ? (
-        <div className="bg-[#1E293B] rounded-[12px] border border-[#334155] shadow-deep-soft p-10 text-center text-body-md text-on-surface-variant">
+        <div className="bg-card-bg rounded-[12px] border border-card-border shadow-deep-soft p-10 text-center text-body-md text-on-surface-variant">
           {sessions.length === 0
             ? "저장된 토론 세션이 아직 없습니다. 좌측 메뉴에서 새 토론을 시작해 보세요."
             : "조건에 맞는 세션이 없습니다."}
         </div>
       ) : (
-        <div className="bg-[#1E293B] rounded-[12px] border border-[#334155] shadow-deep-soft overflow-hidden">
+        <div className="bg-card-bg rounded-[12px] border border-card-border shadow-deep-soft overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-[#1E293B] border-b border-[#334155] text-label-md text-on-surface-variant">
+              <thead className="bg-card-bg border-b border-card-border text-label-md text-on-surface-variant">
                 <tr>
                   <th className="py-4 px-6 font-semibold whitespace-nowrap">종목</th>
                   <th className="py-4 px-6 font-semibold whitespace-nowrap">토론 주제</th>
@@ -112,15 +112,15 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
                   <th className="py-4 px-6 font-semibold whitespace-nowrap text-right">삭제</th>
                 </tr>
               </thead>
-              <tbody className="text-body-md divide-y divide-[#334155]">
+              <tbody className="text-body-md divide-y divide-card-border">
                 {visible.map((s) => {
                   const verdict = s.verdict ?? "neutral";
                   const style = VERDICT_STYLE[verdict];
                   return (
-                    <tr key={s.id} className="hover:bg-[#334155]/30 transition-colors">
+                    <tr key={s.id} className="hover:bg-card-border/30 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#0F172A] border border-[#334155] flex items-center justify-center text-label-sm text-on-surface font-bold">
+                          <div className="w-8 h-8 rounded-full bg-canvas-bg border border-card-border flex items-center justify-center text-label-sm text-on-surface font-bold">
                             {s.symbol_name.slice(0, 1)}
                           </div>
                           <div>
@@ -142,7 +142,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
                       <td className="py-4 px-6 text-right">
                         <Link
                           href={`/debate/${s.id}`}
-                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-btn border border-[#334155] text-label-md text-primary hover:bg-[#3B82F6]/10 hover:border-[#3B82F6]/50 transition-colors"
+                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-btn border border-card-border text-label-md text-primary hover:bg-primary-btn/10 hover:border-primary-btn/50 transition-colors"
                         >
                           리포트 보기
                         </Link>
@@ -162,7 +162,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
                               type="button"
                               onClick={() => setConfirmId(null)}
                               disabled={deletingId === s.id}
-                              className="px-2 py-1.5 rounded-btn text-label-md text-on-surface-variant border border-[#334155] hover:bg-surface-variant/50 transition-colors"
+                              className="px-2 py-1.5 rounded-btn text-label-md text-on-surface-variant border border-card-border hover:bg-surface-variant/50 transition-colors"
                             >
                               취소
                             </button>
@@ -172,7 +172,7 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
                             type="button"
                             onClick={() => setConfirmId(s.id)}
                             aria-label={`${s.symbol_name} 리포트 삭제`}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-btn border border-[#334155] text-on-surface-variant hover:text-error hover:border-error/50 hover:bg-error/10 transition-colors"
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-btn border border-card-border text-on-surface-variant hover:text-error hover:border-error/50 hover:bg-error/10 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[18px]">delete</span>
                           </button>

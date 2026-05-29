@@ -15,7 +15,7 @@ const NAV: NavItem[] = [
   { href: "/debate", icon: "forum", label: "AI Debate" },
   { href: "/watchlist", icon: "visibility", label: "Watchlist", disabled: true },
   { href: "/history", icon: "history", label: "Report History" },
-  { href: "/settings", icon: "settings", label: "Settings", disabled: true },
+  { href: "/settings", icon: "settings", label: "Settings" },
 ];
 
 export default function SideNavBar() {

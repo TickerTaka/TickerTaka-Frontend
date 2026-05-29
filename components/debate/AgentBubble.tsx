@@ -6,14 +6,14 @@ const ROLE_STYLE: Record<
 > = {
   bull: {
     side: "left",
-    bgClass: "bg-[#1E293B] border-[#10B981]",
+    bgClass: "bg-card-bg border-positive",
     icon: "trending_up",
     label: "Bull AI",
     textColor: "text-secondary",
   },
   bear: {
     side: "right",
-    bgClass: "bg-[#1E293B] border-[#EF4444]",
+    bgClass: "bg-card-bg border-negative",
     icon: "trending_down",
     label: "Bear AI",
     textColor: "text-error",
@@ -86,7 +86,7 @@ export default function AgentBubble({ statement }: { statement: AgentStatement }
         <p className="text-body-md text-on-surface mb-stack-sm">{statement.content}</p>
         {(statement.evidence_count > 0 || statement.evidences.length > 0) && (
           <div className={`flex ${isRight ? "justify-end" : ""}`}>
-            <div className="flex items-center gap-1 text-label-sm text-on-surface-variant bg-[#0F172A] px-2 py-1 rounded inline-flex">
+            <div className="flex items-center gap-1 text-label-sm text-on-surface-variant bg-canvas-bg px-2 py-1 rounded inline-flex">
               <span className="material-symbols-outlined text-[14px]">description</span>
               <span>
                 {statement.evidences[0]?.source_label

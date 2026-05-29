@@ -2,11 +2,140 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Toss-style theme tokens ===== */
+:root {
+  /* surfaces */
+  --background: #f2f4f6;
+  --surface: #ffffff;
+  --surface-dim: #f2f4f6;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f9fafb;
+  --surface-container: #ffffff;
+  --surface-container-high: #f9fafb;
+  --surface-container-highest: #f2f4f6;
+  --surface-variant: #f2f4f6;
+  --surface-tint: #3182f6;
+
+  /* text */
+  --on-background: #191f28;
+  --on-surface: #191f28;
+  --on-surface-variant: #6b7684;
+  --inverse-surface: #191f28;
+  --inverse-on-surface: #ffffff;
+
+  /* lines */
+  --outline: #adb5bd;
+  --outline-variant: #e5e8eb;
+
+  /* chrome */
+  --card-bg: #ffffff;
+  --card-border: #e5e8eb;
+  --canvas-bg: #f2f4f6;
+  --input-bg: #f2f4f6;
+
+  /* primary (Toss blue) */
+  --primary: #3182f6;
+  --primary-btn: #3182f6;
+  --primary-container: #e8f3ff;
+  --on-primary: #ffffff;
+  --on-primary-container: #1b64da;
+  --primary-fixed: #e8f3ff;
+  --primary-fixed-dim: #90c2ff;
+  --on-primary-fixed: #0a1f3d;
+  --on-primary-fixed-variant: #1b64da;
+  --inverse-primary: #90c2ff;
+
+  /* secondary = 상승/Bull = red */
+  --secondary: #f04452;
+  --secondary-container: #fce8ea;
+  --on-secondary: #ffffff;
+  --on-secondary-container: #d63d4a;
+
+  /* tertiary = amber accent */
+  --tertiary: #f59e0b;
+  --tertiary-container: #fef0d9;
+  --on-tertiary: #3d2800;
+
+  /* error = 하락/Bear = blue */
+  --error: #3182f6;
+  --error-container: #e8f3ff;
+  --on-error: #ffffff;
+  --on-error-container: #1b64da;
+
+  /* stock semantics (Korean convention) */
+  --positive: #f04452; /* 상승 빨강 */
+  --negative: #3182f6; /* 하락 파랑 */
+  --neutral: #8b95a1;
+
+  --shadow-soft: 0 1px 3px rgba(0, 27, 55, 0.04), 0 6px 20px rgba(0, 27, 55, 0.06);
+}
+
+.dark {
+  --background: #0e1217;
+  --surface: #1b1e23;
+  --surface-dim: #0e1217;
+  --surface-bright: #2c2f36;
+  --surface-container-lowest: #0a0d11;
+  --surface-container-low: #15181d;
+  --surface-container: #1b1e23;
+  --surface-container-high: #22262c;
+  --surface-container-highest: #2c2f36;
+  --surface-variant: #2c2f36;
+  --surface-tint: #4593fc;
+
+  --on-background: #e5e8eb;
+  --on-surface: #e5e8eb;
+  --on-surface-variant: #9ea4aa;
+  --inverse-surface: #e5e8eb;
+  --inverse-on-surface: #191f28;
+
+  --outline: #4e5968;
+  --outline-variant: #2c2f36;
+
+  --card-bg: #1b1e23;
+  --card-border: #2c2f36;
+  --canvas-bg: #0e1217;
+  --input-bg: #15181d;
+
+  --primary: #4593fc;
+  --primary-btn: #4593fc;
+  --primary-container: #1c3a5e;
+  --on-primary: #0e1217;
+  --on-primary-container: #b0d3ff;
+  --primary-fixed: #1c3a5e;
+  --primary-fixed-dim: #4593fc;
+  --on-primary-fixed: #b0d3ff;
+  --on-primary-fixed-variant: #90c2ff;
+  --inverse-primary: #3182f6;
+
+  --secondary: #f9626f;
+  --secondary-container: #4a1d22;
+  --on-secondary: #0e1217;
+  --on-secondary-container: #ffb3ba;
+
+  --tertiary: #fbbf24;
+  --tertiary-container: #4a3408;
+  --on-tertiary: #fef0d9;
+
+  --error: #4593fc;
+  --error-container: #1c3a5e;
+  --on-error: #0e1217;
+  --on-error-container: #b0d3ff;
+
+  --positive: #f9626f;
+  --negative: #4593fc;
+  --neutral: #8b95a1;
+
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
 html,
 body {
-  background-color: #081425;
-  color: #d8e3fb;
-  font-family: "Inter", "Noto Sans KR", sans-serif;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: "Pretendard", "Inter", "Noto Sans KR", -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .material-symbols-outlined {
@@ -22,14 +151,14 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--outline-variant);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #424754;
+  background: var(--outline);
 }
 
 .scrollbar-hide::-webkit-scrollbar {

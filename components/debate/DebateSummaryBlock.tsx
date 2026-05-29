@@ -16,8 +16,8 @@ export default function DebateSummaryBlock({ detail }: { detail: DebateDetail })
         : "text-on-surface-variant bg-surface-variant border-outline-variant";
 
   return (
-    <div className="bg-gradient-to-br from-[#1E293B] to-surface-container rounded-xl border border-primary/30 shadow-deep-soft overflow-hidden">
-      <div className="p-[20px] border-b border-[#334155] flex items-center justify-between gap-3 flex-wrap">
+    <div className="bg-gradient-to-br from-card-bg to-surface-container rounded-xl border border-primary/30 shadow-deep-soft overflow-hidden">
+      <div className="p-[20px] border-b border-card-border flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-headline-md text-primary flex items-center gap-2">
           <span className="material-symbols-outlined">insights</span>
           최종 토론 요약
@@ -74,7 +74,7 @@ function StrengthBar({ label, value, tone }: { label: string; value: number; ton
   const textColor = tone === "bull" ? "text-secondary" : "text-error";
   const border = tone === "bull" ? "border-secondary/30" : "border-error/30";
   return (
-    <div className={`bg-[#1E293B] border ${border} rounded-lg p-stack-md flex flex-col gap-2`}>
+    <div className={`bg-card-bg border ${border} rounded-lg p-stack-md flex flex-col gap-2`}>
       <div className="flex justify-between items-center">
         <span className={`text-label-md ${textColor}`}>{label}</span>
         <span className={`text-body-md font-bold ${textColor}`}>{value} / 5</span>

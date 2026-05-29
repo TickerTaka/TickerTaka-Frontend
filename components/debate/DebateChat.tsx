@@ -12,8 +12,8 @@ export default function DebateChat({ detail }: { detail: DebateDetail }) {
     nextSpeaker === "bull" ? "강세론 분석 중" : "약세론 분석 중";
 
   return (
-    <div className="bg-[#1E293B] rounded-xl border border-[#334155] shadow-deep-soft flex flex-col h-full overflow-hidden">
-      <div className="p-[20px] border-b border-[#334155] flex justify-between items-center bg-surface-container-high z-10">
+    <div className="bg-card-bg rounded-xl border border-card-border shadow-deep-soft flex flex-col h-full overflow-hidden">
+      <div className="p-[20px] border-b border-card-border flex justify-between items-center bg-surface-container-high z-10">
         <div className="flex items-center gap-stack-sm flex-wrap">
           <h2 className="text-headline-md text-on-surface flex items-center gap-1">
             <span className="material-symbols-outlined text-primary">forum</span>
@@ -41,7 +41,7 @@ export default function DebateChat({ detail }: { detail: DebateDetail }) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-[20px] flex flex-col gap-stack-lg scrollbar-hide bg-[#0F172A] relative">
+      <div className="flex-1 overflow-y-auto p-[20px] flex flex-col gap-stack-lg scrollbar-hide bg-canvas-bg relative">
         <div className="flex flex-col gap-stack-md">
           {statements.map((s) => (
             <AgentBubble key={s.id} statement={s} />
@@ -63,7 +63,7 @@ export default function DebateChat({ detail }: { detail: DebateDetail }) {
                 {nextSpeaker === "bull" ? "trending_up" : "trending_down"}
               </span>
             </div>
-            <div className="bg-[#1E293B] border border-[#334155] rounded-full px-4 py-2 flex items-center text-body-sm text-on-surface-variant">
+            <div className="bg-card-bg border border-card-border rounded-full px-4 py-2 flex items-center text-body-sm text-on-surface-variant">
               {waitingLabel}<span className="typing-dots" />
             </div>
           </div>

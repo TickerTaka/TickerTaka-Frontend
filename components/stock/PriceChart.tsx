@@ -1,6 +1,6 @@
 export default function PriceChart() {
   return (
-    <div className="w-full h-[300px] relative border-b border-l border-[#334155] mt-2 rounded-bl-sm">
+    <div className="w-full h-[300px] relative border-b border-l border-card-border mt-2 rounded-bl-sm">
       <svg
         className="absolute inset-0 w-full h-full"
         preserveAspectRatio="none"
@@ -11,7 +11,7 @@ export default function PriceChart() {
           x2="100"
           y1="25"
           y2="25"
-          stroke="#334155"
+          stroke="var(--card-border)"
           strokeDasharray="2,2"
           strokeOpacity="0.5"
           strokeWidth="0.5"
@@ -21,7 +21,7 @@ export default function PriceChart() {
           x2="100"
           y1="50"
           y2="50"
-          stroke="#334155"
+          stroke="var(--card-border)"
           strokeDasharray="2,2"
           strokeOpacity="0.5"
           strokeWidth="0.5"
@@ -31,15 +31,15 @@ export default function PriceChart() {
           x2="100"
           y1="75"
           y2="75"
-          stroke="#334155"
+          stroke="var(--card-border)"
           strokeDasharray="2,2"
           strokeOpacity="0.5"
           strokeWidth="0.5"
         />
         <defs>
           <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path
@@ -49,7 +49,7 @@ export default function PriceChart() {
         <path
           d="M0 80 Q 20 60, 40 70 T 80 40 L 100 20"
           fill="none"
-          stroke="#3B82F6"
+          stroke="var(--primary)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
         />
@@ -57,8 +57,8 @@ export default function PriceChart() {
           cx="100"
           cy="20"
           r="2"
-          fill="#3B82F6"
-          stroke="#1E293B"
+          fill="var(--primary)"
+          stroke="var(--card-bg)"
           strokeWidth="1"
           vectorEffect="non-scaling-stroke"
         />

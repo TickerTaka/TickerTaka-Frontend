@@ -43,14 +43,14 @@ export default function DebateSetup({ tickers }: { tickers: TickerOption[] }) {
   }
 
   return (
-    <div className="bg-[#1E293B] rounded-xl border border-[#334155] p-[20px] shadow-deep-soft flex flex-col gap-stack-lg">
+    <div className="bg-card-bg rounded-xl border border-card-border p-[20px] shadow-deep-soft flex flex-col gap-stack-lg">
       <div>
         <h2 className="text-headline-sm mb-stack-sm text-on-surface">토론 설정</h2>
         {hasTickers ? (
           <select
             value={symbol}
             onChange={(e) => setSymbol(e.target.value)}
-            className="w-full bg-[#0F172A] border border-[#334155] rounded px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary"
+            className="w-full bg-canvas-bg border border-card-border rounded px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary"
           >
             {tickers.map((t) => (
               <option key={t.symbol} value={t.symbol}>
@@ -99,7 +99,7 @@ export default function DebateSetup({ tickers }: { tickers: TickerOption[] }) {
         type="button"
         onClick={onStart}
         disabled={submitting || !symbol}
-        className="w-full py-stack-sm bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-60 text-white text-body-md font-bold rounded-lg transition-colors flex justify-center items-center gap-1"
+        className="w-full py-stack-sm bg-primary-btn hover:opacity-90 disabled:opacity-60 text-white text-body-md font-bold rounded-lg transition-colors flex justify-center items-center gap-1"
       >
         {submitting ? "시작 중..." : "토론 시작"}
       </button>

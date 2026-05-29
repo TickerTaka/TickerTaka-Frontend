@@ -20,8 +20,8 @@ export default async function DebateIndexPage() {
       </div>
 
       <div className="w-full md:w-8/12 flex flex-col gap-stack-md">
-        <div className="bg-[#1E293B] rounded-xl border border-[#334155] shadow-deep-soft">
-          <div className="p-[20px] border-b border-[#334155]">
+        <div className="bg-card-bg rounded-xl border border-card-border shadow-deep-soft">
+          <div className="p-[20px] border-b border-card-border">
             <h2 className="text-headline-sm text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">forum</span>
               최근 토론 세션
@@ -30,12 +30,12 @@ export default async function DebateIndexPage() {
               좌측에서 종목과 주제를 골라 새 토론을 시작하거나, 아래에서 기존 세션을 이어 보세요.
             </p>
           </div>
-          <ul className="divide-y divide-[#334155]/50">
+          <ul className="divide-y divide-card-border/50">
             {recent.map((s) => (
               <li key={s.id}>
                 <Link
                   href={`/debate/${s.id}`}
-                  className="flex items-center justify-between p-4 hover:bg-[#334155]/30 transition-colors"
+                  className="flex items-center justify-between p-4 hover:bg-card-border/30 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-canvas-bg border border-card-border flex items-center justify-center text-label-md text-primary font-bold">

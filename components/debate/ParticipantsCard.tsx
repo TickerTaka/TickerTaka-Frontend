@@ -1,9 +1,9 @@
 export default function ParticipantsCard() {
   return (
-    <div className="bg-[#1E293B] rounded-xl border border-[#334155] p-[20px] shadow-deep-soft flex flex-col gap-stack-md flex-1">
+    <div className="bg-card-bg rounded-xl border border-card-border p-[20px] shadow-deep-soft flex flex-col gap-stack-md flex-1">
       <h2 className="text-headline-sm text-on-surface">토론 참여자</h2>
 
-      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-[#334155] bg-secondary-container/10">
+      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-card-border bg-secondary-container/10">
         <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
           <span className="material-symbols-outlined text-[20px]">trending_up</span>
         </div>
@@ -13,7 +13,7 @@ export default function ParticipantsCard() {
         </div>
       </div>
 
-      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-[#334155] bg-error-container/10">
+      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-card-border bg-error-container/10">
         <div className="w-10 h-10 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
           <span className="material-symbols-outlined text-[20px]">trending_down</span>
         </div>
@@ -23,7 +23,7 @@ export default function ParticipantsCard() {
         </div>
       </div>
 
-      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-[#334155] bg-surface-variant">
+      <div className="flex items-center gap-stack-md p-stack-sm rounded-lg border border-card-border bg-surface-variant">
         <div className="w-10 h-10 rounded-full bg-outline-variant flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined text-[20px]">gavel</span>
         </div>

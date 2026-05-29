@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeToggleButton from "@/components/layout/ThemeToggleButton";
 
 export default function TopNavBar() {
   return (
@@ -30,6 +31,7 @@ export default function TopNavBar() {
           </a>
         </nav>
         <div className="flex items-center gap-3">
+          <ThemeToggleButton />
           <button className="p-1.5 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors">
             <span className="material-symbols-outlined">notifications</span>
           </button>

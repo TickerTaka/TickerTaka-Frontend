@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AddWatchlistCard from "@/components/stock/AddWatchlistCard";
+import WatchlistTable from "@/components/stock/WatchlistTable";
 import { listWatchlist } from "@/lib/api/watchlist";
 import { getDashboardStats, getRecentNews } from "@/lib/api/market";
 import type { WatchlistItem } from "@/lib/types/watchlist";
@@ -51,44 +52,7 @@ export default async function DashboardPage() {
               <span className="text-label-sm text-on-surface-variant">{watchlist.length}건</span>
             </div>
             {watchlistError && <div className="p-4 text-body-sm text-error">{watchlistError}</div>}
-            {!watchlistError && watchlist.length === 0 && (
-              <div className="p-6 text-center text-body-sm text-on-surface-variant">
-                아직 추가된 관심 종목이 없습니다. 우측 카드에서 종목을 추가해 주세요.
-              </div>
-            )}
-            {watchlist.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-card-bg border-b border-card-border">
-                      <th className="px-5 py-3 text-label-md text-on-surface-variant font-normal">종목명</th>
-                      <th className="px-5 py-3 text-label-md text-on-surface-variant font-normal">종목코드</th>
-                      <th className="px-5 py-3 text-label-md text-on-surface-variant font-normal">메모</th>
-                      <th className="px-5 py-3 text-label-md text-on-surface-variant font-normal text-right">추가일</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-body-sm">
-                    {watchlist.map((w) => (
-                      <tr
-                        key={w.id}
-                        className="border-b border-card-border/50 hover:bg-card-border/30 transition-colors cursor-pointer"
-                      >
-                        <td className="px-5 py-3 font-semibold text-on-surface">
-                          <Link href={`/stock/${w.symbol}`} className="hover:text-primary">
-                            {w.ticker_name_kr ?? w.symbol}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3 text-on-surface-variant">{w.symbol}</td>
-                        <td className="px-5 py-3 text-on-surface-variant">{w.memo ?? "—"}</td>
-                        <td className="px-5 py-3 text-right text-on-surface-variant">
-                          {new Date(w.created_at).toLocaleDateString("ko-KR")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {!watchlistError && <WatchlistTable initialItems={watchlist} />}
           </div>
 
           {/* Recent news */}

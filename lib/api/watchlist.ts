@@ -1,4 +1,4 @@
-import { DEFAULT_USER_ID, apiGet, apiPost, isMockMode } from "@/lib/api/client";
+import { DEFAULT_USER_ID, apiDelete, apiGet, apiPost, isMockMode } from "@/lib/api/client";
 import type {
   WatchlistCreateRequest,
   WatchlistCreateResponse,
@@ -55,4 +55,16 @@ export async function createWatchlist(
     "/api/watchlists",
     payload,
   );
+}
+
+export async function deleteWatchlist(
+  symbol: string,
+  userId: string = DEFAULT_USER_ID,
+): Promise<void> {
+  if (isMockMode()) {
+    const idx = MOCK_ITEMS.findIndex((i) => i.symbol === symbol);
+    if (idx >= 0) MOCK_ITEMS.splice(idx, 1);
+    return;
+  }
+  await apiDelete(`/api/watchlists/${userId}/${encodeURIComponent(symbol)}`);
 }

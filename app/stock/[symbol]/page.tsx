@@ -108,7 +108,7 @@ export default async function StockDetailPage({ params }: PageProps) {
             </Link>
             <Link
               href="/debate"
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn bg-[#3B82F6] text-white text-label-md hover:bg-blue-600 transition-colors shadow-sm"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn bg-primary-btn text-white text-label-md hover:opacity-90 transition-colors shadow-sm"
             >
               <span className="material-symbols-outlined text-[18px]">forum</span>
               AI 토론 시작
@@ -119,7 +119,7 @@ export default async function StockDetailPage({ params }: PageProps) {
 
       <div className="grid grid-cols-12 gap-gutter">
         {/* Core financials */}
-        <div className="col-span-12 lg:col-span-6 bg-[#1E293B] rounded-xl border border-[#334155] p-5 flex flex-col gap-4 shadow-deep-soft">
+        <div className="col-span-12 lg:col-span-6 bg-card-bg rounded-xl border border-card-border p-5 flex flex-col gap-4 shadow-deep-soft">
           <div className="flex justify-between items-center">
             <h2 className="text-headline-sm text-on-surface">핵심 재무 지표</h2>
             {fin?.fiscal_year && (
@@ -146,7 +146,7 @@ export default async function StockDetailPage({ params }: PageProps) {
         </div>
 
         {/* Tech indicators */}
-        <div className="col-span-12 lg:col-span-6 bg-[#1E293B] rounded-xl border border-[#334155] p-5 shadow-deep-soft">
+        <div className="col-span-12 lg:col-span-6 bg-card-bg rounded-xl border border-card-border p-5 shadow-deep-soft">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-headline-sm text-on-surface">기술 지표</h2>
             {tech?.date && <span className="text-label-sm text-on-surface-variant">{tech.date} 기준</span>}
@@ -166,8 +166,8 @@ export default async function StockDetailPage({ params }: PageProps) {
         </div>
 
         {/* News */}
-        <div className="col-span-12 bg-[#1E293B] rounded-xl border border-[#334155] shadow-deep-soft overflow-hidden">
-          <div className="p-5 border-b border-[#334155] flex justify-between items-center">
+        <div className="col-span-12 bg-card-bg rounded-xl border border-card-border shadow-deep-soft overflow-hidden">
+          <div className="p-5 border-b border-card-border flex justify-between items-center">
             <h2 className="text-headline-sm text-on-surface">최신 뉴스</h2>
           </div>
           {news.length === 0 ? (
@@ -176,15 +176,15 @@ export default async function StockDetailPage({ params }: PageProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#1E293B]">
-                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-[#334155] w-[140px]">날짜</th>
-                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-[#334155]">제목</th>
-                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-[#334155] w-[120px]">출처</th>
+                  <tr className="bg-card-bg">
+                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border w-[140px]">날짜</th>
+                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border">제목</th>
+                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border w-[120px]">출처</th>
                   </tr>
                 </thead>
                 <tbody className="text-body-md">
                   {news.map((n) => (
-                    <tr key={n.id} className="border-b border-[#334155] hover:bg-[#334155]/30 transition-colors group">
+                    <tr key={n.id} className="border-b border-card-border hover:bg-card-border/30 transition-colors group">
                       <td className="py-3 px-5 text-on-surface-variant whitespace-nowrap">
                         {n.published_at ? new Date(n.published_at).toLocaleDateString("ko-KR") : "—"}
                       </td>
