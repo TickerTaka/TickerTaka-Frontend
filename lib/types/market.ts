@@ -65,6 +65,29 @@ export interface StockPrices {
   prices: PricePoint[];
 }
 
+export interface FilingItem {
+  id: string;
+  symbol: string;
+  filing_title: string;
+  filing_type: string | null;
+  summary: string | null;
+  source_url: string;
+  disclosed_at: string | null;
+  retrieved_at: string;
+}
+
+export interface WatchlistFeedItem {
+  id: string;
+  symbol: string;
+  symbol_name: string | null;
+  kind: "news" | "filing";
+  title: string;
+  summary: string | null;
+  source_name: string | null;
+  source_url: string;
+  published_at: string | null;
+}
+
 export interface NewsItem {
   id: string;
   symbol: string;

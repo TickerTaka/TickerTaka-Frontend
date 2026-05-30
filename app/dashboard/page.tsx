@@ -2,9 +2,9 @@ import Link from "next/link";
 import AddWatchlistCard from "@/components/stock/AddWatchlistCard";
 import WatchlistTable from "@/components/stock/WatchlistTable";
 import { listWatchlist } from "@/lib/api/watchlist";
-import { getDashboardStats, getRecentNews } from "@/lib/api/market";
+import { getDashboardStats, getWatchlistFeed } from "@/lib/api/market";
 import type { WatchlistItem } from "@/lib/types/watchlist";
-import type { DashboardStats, NewsItem } from "@/lib/types/market";
+import type { DashboardStats, WatchlistFeedItem } from "@/lib/types/market";
 
 function relativeTime(iso: string | null) {
   if (!iso) return "";
@@ -18,17 +18,17 @@ function relativeTime(iso: string | null) {
 export default async function DashboardPage() {
   let watchlist: WatchlistItem[] = [];
   let watchlistError: string | null = null;
-  let news: NewsItem[] = [];
+  let feed: WatchlistFeedItem[] = [];
   let stats: DashboardStats | null = null;
 
-  const [wl, nw, st] = await Promise.allSettled([
+  const [wl, fd, st] = await Promise.allSettled([
     listWatchlist(),
-    getRecentNews(8),
+    getWatchlistFeed(20),
     getDashboardStats(),
   ]);
   if (wl.status === "fulfilled") watchlist = wl.value;
   else watchlistError = wl.reason instanceof Error ? wl.reason.message : "관심 종목을 불러오지 못했습니다";
-  if (nw.status === "fulfilled") news = nw.value;
+  if (fd.status === "fulfilled") feed = fd.value;
   if (st.status === "fulfilled") stats = st.value;
 
   const runningCount =
@@ -60,34 +60,56 @@ export default async function DashboardPage() {
             <div className="p-5 border-b border-card-border flex justify-between items-center">
               <h3 className="text-headline-sm text-on-surface flex items-center">
                 <span className="material-symbols-outlined mr-2 text-primary">article</span>
-                최근 뉴스
+                관심 종목 뉴스·공시
               </h3>
+              <span className="text-label-sm text-on-surface-variant">{feed.length}건</span>
             </div>
-            {news.length === 0 ? (
-              <div className="p-6 text-center text-body-sm text-on-surface-variant">최근 뉴스가 없습니다.</div>
+            {watchlist.length === 0 ? (
+              <div className="p-6 text-center text-body-sm text-on-surface-variant">
+                관심 종목을 추가하면 해당 종목의 뉴스와 공시가 여기에 표시됩니다.
+              </div>
+            ) : feed.length === 0 ? (
+              <div className="p-6 text-center text-body-sm text-on-surface-variant">
+                아직 수집된 뉴스·공시가 없습니다. 잠시 후 다시 확인해 주세요.
+              </div>
             ) : (
               <ul className="divide-y divide-card-border/50">
-                {news.map((n) => (
-                  <li key={n.id} className="p-4 hover:bg-card-border/20 transition-colors group flex gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 rounded bg-canvas-bg border border-card-border flex items-center justify-center text-label-md text-primary font-bold">
-                      {n.symbol.slice(0, 2)}
-                    </div>
+                {feed.map((f) => (
+                  <li key={`${f.kind}-${f.id}`} className="p-4 hover:bg-card-border/20 transition-colors group flex gap-4">
+                    <Link
+                      href={`/stock/${f.symbol}`}
+                      className="flex-shrink-0 w-10 h-10 rounded bg-canvas-bg border border-card-border flex items-center justify-center text-label-md text-primary font-bold hover:bg-primary/10"
+                      title={f.symbol_name ?? f.symbol}
+                    >
+                      {(f.symbol_name ?? f.symbol).slice(0, 2)}
+                    </Link>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-label-sm px-1.5 py-0.5 rounded text-primary-btn bg-primary-btn/10">
-                          {n.source_name ?? "뉴스"}
-                        </span>
-                        <span className="text-label-sm text-outline-variant">
-                          {relativeTime(n.published_at ?? n.retrieved_at)}
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`text-label-sm px-1.5 py-0.5 rounded font-semibold ${
+                              f.kind === "filing"
+                                ? "text-tertiary bg-tertiary/10"
+                                : "text-primary-btn bg-primary-btn/10"
+                            }`}
+                          >
+                            {f.kind === "filing" ? "공시" : "뉴스"}
+                          </span>
+                          <span className="text-label-sm text-on-surface-variant truncate">
+                            {f.symbol_name ?? f.symbol} · {f.source_name ?? "—"}
+                          </span>
+                        </div>
+                        <span className="text-label-sm text-outline-variant shrink-0">
+                          {relativeTime(f.published_at)}
                         </span>
                       </div>
                       <a
-                        href={n.source_url}
+                        href={f.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-body-md text-on-surface group-hover:text-primary transition-colors line-clamp-1"
+                        className="text-body-md text-on-surface group-hover:text-primary transition-colors line-clamp-2"
                       >
-                        {n.title}
+                        {f.title}
                       </a>
                     </div>
                   </li>

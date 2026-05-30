@@ -1,11 +1,13 @@
-import { apiGet, isMockMode } from "@/lib/api/client";
+import { DEFAULT_USER_ID, apiGet, isMockMode } from "@/lib/api/client";
 import type {
   DashboardStats,
+  FilingItem,
   MarketIndexItem,
   NewsItem,
   StockDetail,
   StockPrices,
   TickerSearchItem,
+  WatchlistFeedItem,
 } from "@/lib/types/market";
 
 interface Wrapped<T> {
@@ -52,4 +54,26 @@ export async function getMarketIndexes(): Promise<MarketIndexItem[]> {
 export async function getDashboardStats(): Promise<DashboardStats | null> {
   if (isMockMode()) return null;
   return apiGet<DashboardStats>(`/api/dashboard/stats`);
+}
+
+export async function getStockFilings(symbol: string, limit = 20): Promise<FilingItem[]> {
+  const res = await apiGet<Wrapped<FilingItem[]>>(
+    `/api/stocks/${encodeURIComponent(symbol)}/filings?limit=${limit}`,
+  );
+  return res.items;
+}
+
+export async function getWatchlistFeed(
+  limit = 20,
+  userId: string = DEFAULT_USER_ID,
+): Promise<WatchlistFeedItem[]> {
+  if (isMockMode()) return [];
+  try {
+    const res = await apiGet<Wrapped<WatchlistFeedItem[]>>(
+      `/api/watchlists/${userId}/feed?limit=${limit}`,
+    );
+    return res.items;
+  } catch {
+    return [];
+  }
 }
