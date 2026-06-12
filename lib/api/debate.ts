@@ -2,7 +2,7 @@
 // Backend returns DebateSessionResponse (flat). We transform it into
 // { session, statements, summary } so the existing components keep working.
 
-import { DEFAULT_USER_ID, apiDelete, apiGet, apiPost, isMockMode } from "@/lib/api/client";
+import { DEFAULT_USER_ID, apiBaseUrl, apiDelete, apiGet, apiPost, isMockMode } from "@/lib/api/client";
 import { listWatchlist } from "@/lib/api/watchlist";
 import { MOCK_SESSIONS, MOCK_TICKERS, buildMockDetail } from "@/lib/mock/debate-data";
 import type {
@@ -10,6 +10,7 @@ import type {
   DebateCategory,
   DebateDetail,
   DebateSession,
+  DebateSessionMeta,
   DebateStatus,
   ModeratorSummary,
   StartDebateRequest,
@@ -43,6 +44,16 @@ interface BackendSessionResponse {
   statements: BackendStatement[];
   // optional enrichment if backend adds it later
   symbol_name?: string;
+  notion_page_id?: string | null;
+  notion_page_url?: string | null;
+  notion_published_at?: string | null;
+}
+
+interface NotionPublishResponse {
+  session_id: string;
+  notion_page_id: string;
+  notion_page_url: string;
+  notion_published_at: string;
 }
 
 function toDetail(raw: BackendSessionResponse, fallbackName?: string): DebateDetail {
@@ -55,6 +66,9 @@ function toDetail(raw: BackendSessionResponse, fallbackName?: string): DebateDet
     status: raw.status as DebateStatus,
     started_at: raw.started_at ?? new Date().toISOString(),
     completed_at: raw.completed_at,
+    notion_page_id: raw.notion_page_id ?? null,
+    notion_page_url: raw.notion_page_url ?? null,
+    notion_published_at: raw.notion_published_at ?? null,
   };
 
   const statements: AgentStatement[] = raw.statements.map((s) => ({
@@ -134,6 +148,43 @@ export async function listDebateSessions(): Promise<DebateSession[]> {
   }));
 }
 
+// New flow: create a session row (returns immediately with status="pending"),
+// then the caller opens an SSE connection to /stream to receive events.
+export async function createDebateSession(req: StartDebateRequest): Promise<DebateSessionMeta> {
+  if (isMockMode()) {
+    return {
+      session_id: `sess-${Date.now()}`,
+      user_id: req.user_id,
+      symbol: req.symbol,
+      symbol_name: req.symbol,
+      category: req.category,
+      status: "pending",
+      started_at: new Date().toISOString(),
+    };
+  }
+  return apiPost<StartDebateRequest, DebateSessionMeta>("/api/debates/sessions", req);
+}
+
+// Absolute URL the SSE client (EventSource) should connect to.
+export function debateStreamUrl(sessionId: string): string {
+  return `${apiBaseUrl}/api/debates/${sessionId}/stream`;
+}
+
+export async function publishDebateToNotion(sessionId: string): Promise<NotionPublishResponse> {
+  if (isMockMode()) {
+    return {
+      session_id: sessionId,
+      notion_page_id: "mock-page",
+      notion_page_url: "https://www.notion.so/mock-page",
+      notion_published_at: new Date().toISOString(),
+    };
+  }
+  return apiPost<Record<string, never>, NotionPublishResponse>(
+    `/api/debates/${sessionId}/publish/notion`,
+    {} as Record<string, never>,
+  );
+}
+
 export async function deleteDebateSession(sessionId: string): Promise<void> {
   if (isMockMode()) {
     const idx = MOCK_SESSIONS.findIndex((s) => s.id === sessionId);
@@ -172,7 +223,6 @@ export async function startDebate(req: StartDebateRequest): Promise<DebateDetail
     user_id: req.user_id || DEFAULT_USER_ID,
     symbol: req.symbol,
     category: req.category,
-    avg_price: req.avg_price ?? null,
   };
   const raw = await apiPost<typeof payload, BackendSessionResponse>("/api/debates", payload);
   return toDetail(raw);

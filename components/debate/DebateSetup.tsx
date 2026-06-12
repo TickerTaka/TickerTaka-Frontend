@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { startDebate } from "@/lib/api/debate";
+import { createDebateSession } from "@/lib/api/debate";
 import type { DebateCategory } from "@/lib/types/debate";
 import { CATEGORY_LABEL } from "@/lib/types/debate";
 import type { TickerOption } from "@/lib/api/debate";
@@ -29,12 +29,12 @@ export default function DebateSetup({ tickers }: { tickers: TickerOption[] }) {
     setSubmitting(true);
     setError(null);
     try {
-      const detail = await startDebate({
+      const meta = await createDebateSession({
         user_id: DEFAULT_USER_ID,
         symbol,
         category,
       });
-      router.push(`/debate/${detail.session.id}`);
+      router.push(`/debate/${meta.session_id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "토론 시작 실패");
     } finally {

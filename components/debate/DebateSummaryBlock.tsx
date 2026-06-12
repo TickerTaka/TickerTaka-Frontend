@@ -1,8 +1,10 @@
+import NotionPublishButton from "./NotionPublishButton";
 import type { DebateDetail } from "@/lib/types/debate";
 
 export default function DebateSummaryBlock({ detail }: { detail: DebateDetail }) {
-  const { summary, bull_strength = 0, bear_strength = 0 } = detail;
+  const { session, summary, bull_strength = 0, bear_strength = 0 } = detail;
   if (!summary) return null;
+  const isCompleted = session.status === "completed";
 
   const verdict =
     bull_strength > bear_strength ? "bull" : bear_strength > bull_strength ? "bear" : "neutral";
@@ -22,9 +24,16 @@ export default function DebateSummaryBlock({ detail }: { detail: DebateDetail })
           <span className="material-symbols-outlined">insights</span>
           최종 토론 요약
         </h2>
-        <span className={`px-3 py-1 rounded-full text-label-md font-semibold border ${verdictTone}`}>
-          {verdictLabel}
-        </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`px-3 py-1 rounded-full text-label-md font-semibold border ${verdictTone}`}>
+            {verdictLabel}
+          </span>
+          <NotionPublishButton
+            sessionId={session.id}
+            initialUrl={session.notion_page_url ?? null}
+            disabled={!isCompleted}
+          />
+        </div>
       </div>
 
       <div className="p-[24px] flex flex-col gap-stack-lg">

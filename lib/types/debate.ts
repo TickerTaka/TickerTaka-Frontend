@@ -9,7 +9,15 @@ export type DebateCategory =
 
 export type DebateStatus = "pending" | "running" | "completed" | "failed";
 
-export type DebateRound = "opening" | "rebuttal" | "closing" | "summary";
+// Legacy rounds (opening/closing) kept for older sessions; new graph uses
+// claim / rebuttal / counter_rebuttal / summary.
+export type DebateRound =
+  | "opening"
+  | "claim"
+  | "rebuttal"
+  | "counter_rebuttal"
+  | "closing"
+  | "summary";
 
 export type AgentRole = "bull" | "bear" | "moderator" | "system";
 
@@ -36,6 +44,7 @@ export interface AgentStatement {
   session_id: string;
   round: DebateRound;
   round_order: number;
+  topic_index?: number; // 4-turn graph indexes which agenda topic this is
   agent_role: AgentRole;
   content: string;
   model_used: string;
@@ -61,6 +70,9 @@ export interface DebateSession {
   started_at: string;
   completed_at: string | null;
   verdict?: "bull" | "bear" | "neutral";
+  notion_page_id?: string | null;
+  notion_page_url?: string | null;
+  notion_published_at?: string | null;
 }
 
 export interface DebateDetail {
@@ -75,7 +87,17 @@ export interface StartDebateRequest {
   user_id: string;
   symbol: string;
   category: DebateCategory;
-  avg_price?: number | null;
+}
+
+// Shape returned by POST /api/debates/sessions — minimal metadata, no statements.
+export interface DebateSessionMeta {
+  session_id: string;
+  user_id: string;
+  symbol: string;
+  symbol_name?: string;
+  category: DebateCategory;
+  status: DebateStatus;
+  started_at: string;
 }
 
 export const CATEGORY_LABEL: Record<DebateCategory, string> = {
