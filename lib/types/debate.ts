@@ -83,10 +83,13 @@ export interface DebateDetail {
   bear_strength?: number;
 }
 
+export type DecisionAgent = "moderator" | "judge";
+
 export interface StartDebateRequest {
   user_id: string;
   symbol: string;
   category: DebateCategory;
+  decision_agent?: DecisionAgent;
 }
 
 // Shape returned by POST /api/debates/sessions — minimal metadata, no statements.
