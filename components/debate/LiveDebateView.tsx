@@ -129,15 +129,10 @@ export default function LiveDebateView({ initial }: Props) {
           (s) => s.round_order === statement.round_order,
         );
         const next = exists ? prev.statements : [...prev.statements, statement];
-        // Keep ordered by round_order
+        // Keep ordered by round_order. Bull/Bear strength is derived from
+        // statements directly in DebateSummaryBlock, so we don't compute it here.
         next.sort((a, b) => a.round_order - b.round_order);
-        const counts = strengths(next);
-        return {
-          ...prev,
-          statements: next,
-          bull_strength: counts.bull,
-          bear_strength: counts.bear,
-        };
+        return { ...prev, statements: next };
       });
     });
 
@@ -238,14 +233,6 @@ function stageLabel(node: string, stage: string): string {
     moderator_summary: "최종 요약",
   };
   return `${map[node] ?? node} · ${stage}`;
-}
-
-function strengths(statements: AgentStatement[]): { bull: number; bear: number } {
-  const bull = statements.filter((s) => s.agent_role === "bull").length;
-  const bear = statements.filter((s) => s.agent_role === "bear").length;
-  const total = Math.max(1, bull + bear);
-  const bullScore = Math.min(5, Math.max(0, Math.round((bull / total) * 5)));
-  return { bull: bullScore, bear: Math.min(5, Math.max(0, 5 - bullScore)) };
 }
 
 function SessionInfo({

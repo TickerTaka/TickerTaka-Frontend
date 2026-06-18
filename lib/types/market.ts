@@ -76,6 +76,8 @@ export interface FilingItem {
   retrieved_at: string;
 }
 
+export type Sentiment = "positive" | "negative" | "neutral" | "mixed";
+
 export interface WatchlistFeedItem {
   id: string;
   symbol: string;
@@ -86,6 +88,15 @@ export interface WatchlistFeedItem {
   source_name: string | null;
   source_url: string;
   published_at: string | null;
+  // Sentiment analysis (FinBERT + Qwen). Null while the worker hasn't filled it yet.
+  sentiment: Sentiment | null;
+  impact_score: number | null;       // -2..+2
+  confidence: number | null;          // 0..1
+  event_type: string | null;
+  analysis_summary: string | null;
+  key_points: string[];
+  risks: string[];
+  evidence: string[];
 }
 
 export interface NewsItem {

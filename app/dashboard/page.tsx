@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AddWatchlistCard from "@/components/stock/AddWatchlistCard";
 import WatchlistTable from "@/components/stock/WatchlistTable";
+import SentimentTag, { sentimentBorderColor } from "@/components/stock/SentimentTag";
 import { listWatchlist } from "@/lib/api/watchlist";
 import { getDashboardStats, getWatchlistFeed } from "@/lib/api/market";
 import type { WatchlistItem } from "@/lib/types/watchlist";
@@ -75,7 +76,10 @@ export default async function DashboardPage() {
             ) : (
               <ul className="divide-y divide-card-border/50">
                 {feed.map((f) => (
-                  <li key={`${f.kind}-${f.id}`} className="p-4 hover:bg-card-border/20 transition-colors group flex gap-4">
+                  <li
+                    key={`${f.kind}-${f.id}`}
+                    className={`p-4 hover:bg-card-border/20 transition-colors group flex gap-4 border-l-4 ${sentimentBorderColor(f.sentiment)}`}
+                  >
                     <Link
                       href={`/stock/${f.symbol}`}
                       className="flex-shrink-0 w-10 h-10 rounded bg-canvas-bg border border-card-border flex items-center justify-center text-label-md text-primary font-bold hover:bg-primary/10"
@@ -95,6 +99,16 @@ export default async function DashboardPage() {
                           >
                             {f.kind === "filing" ? "공시" : "뉴스"}
                           </span>
+                          {f.event_type && (
+                            <span className="text-label-sm px-1.5 py-0.5 rounded font-semibold bg-surface-container border border-outline-variant text-on-surface-variant">
+                              {f.event_type}
+                            </span>
+                          )}
+                          <SentimentTag
+                            sentiment={f.sentiment}
+                            impactScore={f.impact_score}
+                            confidence={f.confidence}
+                          />
                           <span className="text-label-sm text-on-surface-variant truncate">
                             {f.symbol_name ?? f.symbol} · {f.source_name ?? "—"}
                           </span>
