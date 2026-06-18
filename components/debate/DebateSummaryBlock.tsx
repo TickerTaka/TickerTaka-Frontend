@@ -149,14 +149,6 @@ export default function DebateSummaryBlock({ detail }: { detail: DebateDetail })
           </div>
         )}
 
-        {/* Strength bars — judge mode only */}
-        {isJudge && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-            <StrengthBar label="Bull (강세)" value={bull_strength} tone="bull" />
-            <StrengthBar label="Bear (약세)" value={bear_strength} tone="bear" />
-          </div>
-        )}
-
       </div>
     </div>
   );
@@ -201,20 +193,3 @@ function renderBoldLine(line: string) {
   );
 }
 
-function StrengthBar({ label, value, tone }: { label: string; value: number; tone: "bull" | "bear" }) {
-  const pct = Math.round((Math.min(5, Math.max(0, value)) / 5) * 100);
-  const color = tone === "bull" ? "bg-secondary" : "bg-error";
-  const textColor = tone === "bull" ? "text-secondary" : "text-error";
-  const border = tone === "bull" ? "border-secondary/30" : "border-error/30";
-  return (
-    <div className={`bg-card-bg border ${border} rounded-lg p-stack-md flex flex-col gap-2`}>
-      <div className="flex justify-between items-center">
-        <span className={`text-label-md ${textColor}`}>{label}</span>
-        <span className={`text-body-md font-bold ${textColor}`}>{value} / 5</span>
-      </div>
-      <div className="h-2 rounded-full bg-surface-variant overflow-hidden">
-        <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
