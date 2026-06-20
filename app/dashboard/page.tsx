@@ -38,7 +38,7 @@ export default async function DashboardPage() {
   return (
     <div className="p-container-padding flex flex-col gap-gutter">
       <header>
-        <h2 className="text-headline-lg text-on-surface">Dashboard</h2>
+        <h2 className="text-headline-lg text-on-surface">종합 현황</h2>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
@@ -46,8 +46,7 @@ export default async function DashboardPage() {
           {/* Watchlist */}
           <div className="bg-card-bg border border-card-border rounded-card shadow-deep-soft flex flex-col overflow-hidden">
             <div className="p-5 border-b border-card-border flex justify-between items-center bg-surface-container-high">
-              <h3 className="text-headline-sm text-on-surface flex items-center">
-                <span className="material-symbols-outlined mr-2 text-primary">visibility</span>
+              <h3 className="text-headline-sm text-on-surface">
                 관심 종목
               </h3>
               <span className="text-label-sm text-on-surface-variant">{watchlist.length}건</span>
@@ -59,8 +58,7 @@ export default async function DashboardPage() {
           {/* Recent news */}
           <div className="bg-card-bg border border-card-border rounded-card shadow-deep-soft flex flex-col">
             <div className="p-5 border-b border-card-border flex justify-between items-center">
-              <h3 className="text-headline-sm text-on-surface flex items-center">
-                <span className="material-symbols-outlined mr-2 text-primary">article</span>
+              <h3 className="text-headline-sm text-on-surface">
                 관심 종목 뉴스·공시
               </h3>
               <span className="text-label-sm text-on-surface-variant">{feed.length}건</span>
@@ -78,7 +76,7 @@ export default async function DashboardPage() {
                 {feed.map((f) => (
                   <li
                     key={`${f.kind}-${f.id}`}
-                    className={`p-4 hover:bg-card-border/20 transition-colors group flex gap-4 border-l-4 border-b border-b-card-border last:border-b-0 ${sentimentBorderColor(f.sentiment)}`}
+                    className={`p-4 group flex gap-4 border-l-4 border-b border-b-card-border last:border-b-0 cursor-default transition-all duration-150 ease-out hover:bg-primary/10 hover:translate-x-1 hover:shadow-md ${sentimentBorderColor(f.sentiment)}`}
                   >
                     <Link
                       href={`/stock/${f.symbol}`}
@@ -139,8 +137,7 @@ export default async function DashboardPage() {
           {/* AI Debate status */}
           <div className="bg-card-bg border border-card-border rounded-card shadow-deep-soft p-5 relative overflow-hidden group">
             <div className="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all duration-500" />
-            <h3 className="text-headline-sm text-on-surface mb-5 flex items-center relative z-10">
-              <span className="material-symbols-outlined mr-2 text-primary">forum</span>
+            <h3 className="text-headline-sm text-on-surface mb-5 relative z-10">
               AI 토론 현황
             </h3>
             <div className="grid grid-cols-2 gap-4 mb-6 relative z-10">

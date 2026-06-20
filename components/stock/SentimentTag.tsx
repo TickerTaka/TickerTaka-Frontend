@@ -1,11 +1,13 @@
 import type { Sentiment } from "@/lib/types/market";
 
 const SENTIMENT_UI: Record<Sentiment, { label: string; cls: string; dot: string }> = {
-  // 이 코드베이스의 토큰: text-secondary = 빨강(상승), text-error = 파랑(하락)
-  positive: { label: "호재", cls: "text-secondary bg-secondary-container/15 border-secondary/30", dot: "bg-secondary" },
-  negative: { label: "악재", cls: "text-error bg-error-container/15 border-error/30", dot: "bg-error" },
+  // 이 코드베이스의 토큰: text-secondary = 빨강(상승), text-error = 파랑(하락).
+  // 보더는 알파 modifier 없이 outline-variant 사용 — 알파 modifier가 CSS 변수에서
+  // currentColor(다크모드 흰색)로 폴백되는 이슈 회피.
+  positive: { label: "호재", cls: "text-secondary bg-secondary-container/15 border-outline-variant", dot: "bg-secondary" },
+  negative: { label: "악재", cls: "text-error bg-error-container/15 border-outline-variant", dot: "bg-error" },
   neutral:  { label: "중립", cls: "text-on-surface-variant bg-surface-variant border-outline-variant", dot: "bg-on-surface-variant" },
-  mixed:    { label: "혼조", cls: "text-tertiary bg-tertiary/10 border-tertiary/30", dot: "bg-tertiary" },
+  mixed:    { label: "혼조", cls: "text-tertiary bg-tertiary/10 border-outline-variant", dot: "bg-tertiary" },
 };
 
 const IMPACT_LABEL = ["강한 악재", "악재", "중립", "호재", "강한 호재"];
@@ -35,7 +37,7 @@ interface Props {
 export default function SentimentTag({ sentiment, impactScore, confidence, size = "sm" }: Props) {
   if (sentiment === null) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm border border-outline-variant/40 text-on-surface-variant bg-surface-variant/40">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm border border-outline-variant text-on-surface-variant bg-surface-variant">
         <span className="material-symbols-outlined text-[12px] animate-pulse">progress_activity</span>
         분석 중
       </span>

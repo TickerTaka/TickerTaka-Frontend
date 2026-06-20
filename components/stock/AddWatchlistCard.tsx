@@ -90,8 +90,7 @@ export default function AddWatchlistCard() {
   return (
     <>
       <div className="bg-card-bg border border-card-border rounded-card shadow-deep-soft p-5">
-        <h3 className="text-headline-sm text-on-surface mb-4 flex items-center">
-          <span className="material-symbols-outlined mr-2 text-primary">add_circle</span>
+        <h3 className="text-headline-sm text-on-surface mb-4">
           관심 종목 추가
         </h3>
         <div className="relative mb-3">
