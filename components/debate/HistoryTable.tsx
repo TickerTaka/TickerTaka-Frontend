@@ -1,18 +1,52 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { deleteDebateSession } from "@/lib/api/debate";
+import { useRouter } from "next/navigation";
+import { deleteDebateSession, getDebateDetail } from "@/lib/api/debate";
 import { CATEGORY_LABEL, VERDICT_LABEL } from "@/lib/types/debate";
-import type { DebateCategory, DebateSession } from "@/lib/types/debate";
+import type { AgentStatement, DebateCategory, DebateSession } from "@/lib/types/debate";
 
-const VERDICT_STYLE: Record<NonNullable<DebateSession["verdict"]>, { bg: string; text: string; dot: string }> = {
-  bull: { bg: "bg-positive/10 border-positive/20", text: "text-positive", dot: "bg-positive" },
-  bear: { bg: "bg-negative/10 border-negative/20", text: "text-negative", dot: "bg-negative" },
-  neutral: { bg: "bg-neutral/10 border-neutral/20", text: "text-neutral", dot: "bg-neutral" },
+type Verdict = NonNullable<DebateSession["verdict"]>;
+
+const VERDICT_STYLE: Record<Verdict, { bg: string; text: string; dot: string }> = {
+  bull: { bg: "bg-secondary/10 border-secondary/30", text: "text-secondary", dot: "bg-secondary" },
+  bear: { bg: "bg-error/10 border-error/30", text: "text-error", dot: "bg-error" },
+  neutral: { bg: "bg-surface-variant border-outline-variant", text: "text-on-surface-variant", dot: "bg-on-surface-variant" },
 };
 
 const FILTERS: (DebateCategory | "all")[] = ["all", "market", "financial", "technical", "macro", "synthesis"];
+
+// 토론 결론 모드를 localStorage에서 읽음 (DebateSetup에서 저장됨).
+function readDecisionMode(sessionId: string): "moderator" | "judge" | null {
+  try {
+    const v = localStorage.getItem(`tt:decision:${sessionId}`);
+    if (v === "judge" || v === "moderator") return v;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+// DebateSummaryBlock과 동일한 가중치 — evidence 수 + 내용 길이로 강세/약세 계산.
+function computeVerdict(statements: AgentStatement[]): Verdict {
+  const weight = (s: AgentStatement) => {
+    const ev = s.evidence_count ?? 0;
+    const len = s.content?.length ?? 0;
+    return ev * 3 + Math.min(15, len / 200);
+  };
+  const bullW = statements
+    .filter((s) => s.agent_role === "bull")
+    .reduce((a, s) => a + weight(s), 0);
+  const bearW = statements
+    .filter((s) => s.agent_role === "bear")
+    .reduce((a, s) => a + weight(s), 0);
+  if (bullW === 0 && bearW === 0) return "neutral";
+  const ratio = bullW / (bullW + bearW);
+  if (ratio > 0.55) return "bull";
+  if (ratio < 0.45) return "bear";
+  return "neutral";
+}
 
 // Locale-independent format to avoid SSR/client hydration mismatch (AM/PM vs 오전/오후).
 function fmtDateTime(iso: string): string {
@@ -30,11 +64,35 @@ export default function HistoryTable({
   focusedSymbol?: string | null;
   focusedSymbolName?: string | null;
 }) {
+  const router = useRouter();
   const [sessions, setSessions] = useState(initialSessions);
   const [filter, setFilter] = useState<DebateCategory | "all">("all");
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  // 판사 모드 세션만 detail을 fetch해 statements 강도로 verdict 계산. 사회자는 무조건 중립.
+  const [verdictBySession, setVerdictBySession] = useState<Record<string, Verdict>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    sessions.forEach((s) => {
+      if (s.status !== "completed") return;
+      const mode = readDecisionMode(s.id);
+      if (mode !== "judge") return; // 사회자/미지정은 모두 중립으로 둠
+      getDebateDetail(s.id)
+        .then((detail) => {
+          if (cancelled) return;
+          const v = computeVerdict(detail.statements);
+          setVerdictBySession((prev) => ({ ...prev, [s.id]: v }));
+        })
+        .catch(() => {
+          /* 실패 시 그냥 중립으로 둠 */
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessions]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -123,90 +181,106 @@ export default function HistoryTable({
         </div>
       ) : (
         <div className="bg-card-bg rounded-[12px] border border-card-border shadow-deep-soft overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-card-bg border-b border-card-border text-label-md text-on-surface-variant">
-                <tr>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap">종목</th>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap">토론 주제</th>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap">결과</th>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap">저장일시</th>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap text-right">리포트 보기</th>
-                  <th className="py-4 px-6 font-semibold whitespace-nowrap text-right">삭제</th>
-                </tr>
-              </thead>
-              <tbody className="text-body-md divide-y divide-card-border">
-                {visible.map((s) => {
-                  const verdict = s.verdict ?? "neutral";
-                  const style = VERDICT_STYLE[verdict];
-                  return (
-                    <tr key={s.id} className="hover:bg-card-border/30 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-canvas-bg border border-card-border flex items-center justify-center text-label-sm text-on-surface font-bold">
-                            {s.symbol_name.slice(0, 1)}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-on-surface">{s.symbol_name}</div>
-                            <div className="text-label-sm text-on-surface-variant">{s.symbol}</div>
-                          </div>
+          {/* Header */}
+          <div className="grid grid-cols-[1.6fr_1.3fr_1.2fr_1.4fr_80px] gap-3 px-6 py-4 bg-card-bg border-b border-card-border text-label-md text-on-surface-variant font-semibold">
+            <span>종목</span>
+            <span>토론 주제</span>
+            <span>결과</span>
+            <span>저장일시</span>
+            <span className="text-right">삭제</span>
+          </div>
+
+          {/* Clickable rows */}
+          <ul className="flex flex-col">
+            {visible.map((s) => {
+              const verdict: Verdict = verdictBySession[s.id] ?? "neutral";
+              const style = VERDICT_STYLE[verdict];
+              return (
+                <li key={s.id} className="border-b border-card-border last:border-b-0">
+                  <div
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => router.push(`/debate/${s.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        router.push(`/debate/${s.id}`);
+                      }
+                    }}
+                    aria-label={`${s.symbol_name} ${CATEGORY_LABEL[s.category]} 리포트 보기`}
+                    className="group relative grid grid-cols-[1.6fr_1.3fr_1.2fr_1.4fr_80px] gap-3 items-center px-6 py-4 cursor-pointer text-body-md transition-all duration-150 ease-out hover:bg-primary/10 hover:translate-x-1 hover:shadow-md focus:outline-none focus-visible:bg-primary/10 focus-visible:translate-x-1"
+                  >
+                    {/* 좌측 강조 바 (호버 시 등장) */}
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-1 rounded-r bg-primary transition-all duration-150 ease-out group-hover:h-2/3 group-focus-visible:h-2/3"
+                    />
+
+                    {/* 종목 */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-canvas-bg border border-card-border flex items-center justify-center text-label-sm text-on-surface font-bold group-hover:border-primary/40 transition-colors">
+                        {s.symbol_name.slice(0, 1)}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          {s.symbol_name}
                         </div>
-                      </td>
-                      <td className="py-4 px-6 text-on-surface">{CATEGORY_LABEL[s.category]}</td>
-                      <td className="py-4 px-6">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded text-label-sm font-semibold border ${style.bg} ${style.text}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${style.dot}`} />
-                          {VERDICT_LABEL[verdict]}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-on-surface-variant">
-                        {fmtDateTime(s.started_at)}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <Link
-                          href={`/debate/${s.id}`}
-                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-btn border border-card-border text-label-md text-primary hover:bg-primary-btn/10 hover:border-primary-btn/50 transition-colors"
-                        >
-                          리포트 보기
-                        </Link>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        {confirmId === s.id ? (
-                          <span className="inline-flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => onDelete(s.id)}
-                              disabled={deletingId === s.id}
-                              className="px-2 py-1.5 rounded-btn text-label-md text-error border border-error/40 hover:bg-error/10 transition-colors disabled:opacity-50"
-                            >
-                              {deletingId === s.id ? "삭제 중" : "확인"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setConfirmId(null)}
-                              disabled={deletingId === s.id}
-                              className="px-2 py-1.5 rounded-btn text-label-md text-on-surface-variant border border-card-border hover:bg-surface-variant/50 transition-colors"
-                            >
-                              취소
-                            </button>
-                          </span>
-                        ) : (
+                        <div className="text-label-sm text-on-surface-variant">{s.symbol}</div>
+                      </div>
+                    </div>
+
+                    <span className="text-on-surface">{CATEGORY_LABEL[s.category]}</span>
+
+                    <span>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded text-label-sm font-semibold border ${style.bg} ${style.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${style.dot}`} />
+                        {VERDICT_LABEL[verdict]}
+                      </span>
+                    </span>
+
+                    <span className="text-on-surface-variant">{fmtDateTime(s.started_at)}</span>
+
+                    {/* 삭제 (블록 클릭 차단) */}
+                    <span
+                      className="text-right"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      {confirmId === s.id ? (
+                        <span className="inline-flex items-center gap-1">
                           <button
                             type="button"
-                            onClick={() => setConfirmId(s.id)}
-                            aria-label={`${s.symbol_name} 리포트 삭제`}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-btn border border-card-border text-on-surface-variant hover:text-error hover:border-error/50 hover:bg-error/10 transition-colors"
+                            onClick={() => onDelete(s.id)}
+                            disabled={deletingId === s.id}
+                            className="px-2 py-1.5 rounded-btn text-label-md text-secondary border border-secondary/40 hover:bg-secondary/10 transition-colors disabled:opacity-50"
                           >
-                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                            {deletingId === s.id ? "삭제 중" : "확인"}
                           </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmId(null)}
+                            disabled={deletingId === s.id}
+                            className="px-2 py-1.5 rounded-btn text-label-md text-on-surface-variant border border-card-border hover:bg-surface-variant/50 transition-colors"
+                          >
+                            취소
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmId(s.id)}
+                          aria-label={`${s.symbol_name} 리포트 삭제`}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-btn border border-card-border text-on-surface-variant hover:text-secondary hover:border-secondary/50 hover:bg-secondary/10 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      )}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
     </>

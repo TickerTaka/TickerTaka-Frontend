@@ -13,7 +13,6 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: "/dashboard", icon: "dashboard", label: "Dashboard" },
   { href: "/debate", icon: "forum", label: "AI Debate" },
-  { href: "/watchlist", icon: "visibility", label: "Watchlist", disabled: true },
   { href: "/history", icon: "history", label: "Report History" },
   { href: "/settings", icon: "settings", label: "Settings" },
 ];
@@ -42,11 +41,12 @@ export default function SideNavBar() {
           const active =
             pathname === item.href ||
             (item.href !== "/" && pathname?.startsWith(item.href));
+          // 강한 호버: 우측 슬라이드 + primary 톤 + 아이콘 확대 + 좌측 강조 바
           const base =
-            "flex items-center gap-3 px-container-padding py-3 font-label-md text-label-md transition-colors";
+            "group relative flex items-center gap-3 px-container-padding py-3 font-label-md text-label-md transition-all duration-150 ease-out";
           const cls = active
-            ? `${base} text-primary border-r-4 border-primary bg-surface-variant/30 font-bold`
-            : `${base} text-on-surface-variant hover:bg-surface-variant/50 ${item.disabled ? "opacity-50 cursor-not-allowed" : ""}`;
+            ? `${base} text-primary border-r-4 border-primary bg-primary/10 font-bold`
+            : `${base} text-on-surface-variant hover:text-primary hover:bg-primary/10 hover:translate-x-1 hover:shadow-sm ${item.disabled ? "opacity-50 cursor-not-allowed hover:translate-x-0 hover:bg-transparent hover:text-on-surface-variant hover:shadow-none" : ""}`;
 
           if (item.disabled) {
             return (
@@ -61,8 +61,14 @@ export default function SideNavBar() {
           return (
             <li key={item.href}>
               <Link href={item.href} className={cls}>
+                {!active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-1 rounded-r bg-primary transition-all duration-150 ease-out group-hover:h-2/3"
+                  />
+                )}
                 <span
-                  className={`material-symbols-outlined ${active ? "icon-fill" : ""}`}
+                  className={`material-symbols-outlined transition-transform duration-150 ${active ? "icon-fill" : "group-hover:scale-110"}`}
                 >
                   {item.icon}
                 </span>

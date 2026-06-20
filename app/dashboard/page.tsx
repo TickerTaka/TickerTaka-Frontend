@@ -74,11 +74,11 @@ export default async function DashboardPage() {
                 아직 수집된 뉴스·공시가 없습니다. 잠시 후 다시 확인해 주세요.
               </div>
             ) : (
-              <ul className="divide-y divide-card-border/50">
+              <ul>
                 {feed.map((f) => (
                   <li
                     key={`${f.kind}-${f.id}`}
-                    className={`p-4 hover:bg-card-border/20 transition-colors group flex gap-4 border-l-4 ${sentimentBorderColor(f.sentiment)}`}
+                    className={`p-4 hover:bg-card-border/20 transition-colors group flex gap-4 border-l-4 border-b border-b-card-border last:border-b-0 ${sentimentBorderColor(f.sentiment)}`}
                   >
                     <Link
                       href={`/stock/${f.symbol}`}
