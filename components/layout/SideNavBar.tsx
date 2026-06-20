@@ -79,8 +79,7 @@ export default function SideNavBar() {
             <span className="material-symbols-outlined">person</span>
           </div>
           <div>
-            <p className="text-label-md text-on-surface">User Profile</p>
-            <p className="text-body-sm text-on-surface-variant">Pro Plan</p>
+            <p className="text-label-md text-on-surface">Administrator</p>
           </div>
         </div>
       </div>
