@@ -22,8 +22,7 @@ export default async function DebateIndexPage() {
       <div className="w-full md:w-8/12 flex flex-col gap-stack-md">
         <div className="bg-card-bg rounded-xl border border-card-border shadow-deep-soft">
           <div className="p-[20px] border-b border-card-border">
-            <h2 className="text-headline-sm text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">forum</span>
+            <h2 className="text-headline-sm text-on-surface">
               최근 토론 세션
             </h2>
             <p className="text-body-sm text-on-surface-variant mt-1">

@@ -15,8 +15,7 @@ export default function DebateChat({ detail }: { detail: DebateDetail }) {
     <div className="bg-card-bg rounded-xl border border-card-border shadow-deep-soft flex flex-col h-full overflow-hidden">
       <div className="p-[20px] border-b border-card-border flex justify-between items-center bg-surface-container-high z-10">
         <div className="flex items-center gap-stack-sm flex-wrap">
-          <h2 className="text-headline-md text-on-surface flex items-center gap-1">
-            <span className="material-symbols-outlined text-primary">forum</span>
+          <h2 className="text-headline-md text-on-surface">
             AI 토론
           </h2>
           <div className="flex gap-1 ml-stack-sm flex-wrap">

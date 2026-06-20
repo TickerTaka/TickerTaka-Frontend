@@ -61,8 +61,7 @@ export default function DebateSummaryBlock({ detail }: { detail: DebateDetail })
   return (
     <div className="bg-gradient-to-br from-card-bg to-surface-container rounded-xl border border-primary/30 shadow-deep-soft overflow-hidden">
       <div className="p-[20px] border-b border-card-border flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-headline-md text-primary flex items-center gap-2">
-          <span className="material-symbols-outlined">{headerIcon}</span>
+        <h2 className="text-headline-md text-primary">
           {headerLabel}
         </h2>
         <div className="flex items-center gap-2 flex-wrap">
