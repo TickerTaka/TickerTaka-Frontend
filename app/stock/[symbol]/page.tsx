@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStockDetail, getStockNews } from "@/lib/api/market";
-import type { NewsItem, StockDetail } from "@/lib/types/market";
+import { getStockDetail, getStockNews, getWatchlistFeed } from "@/lib/api/market";
+import SentimentTag, { sentimentBorderColor } from "@/components/stock/SentimentTag";
+import type { NewsItem, StockDetail, WatchlistFeedItem } from "@/lib/types/market";
 
 interface PageProps {
   params: Promise<{ symbol: string }>;
@@ -30,6 +31,7 @@ export default async function StockDetailPage({ params }: PageProps) {
 
   let stock: StockDetail;
   let news: NewsItem[] = [];
+  let feed: WatchlistFeedItem[] = [];
   try {
     stock = await getStockDetail(symbol);
   } catch {
@@ -40,6 +42,16 @@ export default async function StockDetailPage({ params }: PageProps) {
   } catch {
     news = [];
   }
+  try {
+    // 감성 분석 결과는 별도 API에 있어 id로 매핑해서 합친다.
+    feed = await getWatchlistFeed(50);
+  } catch {
+    feed = [];
+  }
+
+  const sentimentBySourceId = new Map<string, WatchlistFeedItem>(
+    feed.filter((f) => f.symbol === symbol && f.kind === "news").map((f) => [f.id, f]),
+  );
 
   const price = stock.latest_price;
   const fin = stock.latest_financial;
@@ -100,7 +112,7 @@ export default async function StockDetailPage({ params }: PageProps) {
 
           <div className="flex items-center gap-3 w-full lg:w-auto">
             <Link
-              href="/history"
+              href={`/history?symbol=${encodeURIComponent(stock.symbol)}`}
               className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-primary text-primary text-label-md hover:bg-primary/10 transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">history</span>
@@ -178,22 +190,36 @@ export default async function StockDetailPage({ params }: PageProps) {
                 <thead>
                   <tr className="bg-card-bg">
                     <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border w-[140px]">날짜</th>
+                    <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border w-[230px]">투자 영향</th>
                     <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border">제목</th>
                     <th className="py-3 px-5 text-label-md text-on-surface-variant font-medium border-b border-card-border w-[120px]">출처</th>
                   </tr>
                 </thead>
                 <tbody className="text-body-md">
-                  {news.map((n) => (
-                    <tr key={n.id} className="border-b border-card-border hover:bg-card-border/30 transition-colors group">
-                      <td className="py-3 px-5 text-on-surface-variant whitespace-nowrap">
-                        {n.published_at ? new Date(n.published_at).toLocaleDateString("ko-KR") : "—"}
-                      </td>
-                      <td className="py-3 px-5 text-on-surface group-hover:text-primary transition-colors">
-                        <a href={n.source_url} target="_blank" rel="noopener noreferrer">{n.title}</a>
-                      </td>
-                      <td className="py-3 px-5 text-on-surface-variant">{n.source_name ?? "—"}</td>
-                    </tr>
-                  ))}
+                  {news.map((n) => {
+                    const s = sentimentBySourceId.get(n.id);
+                    return (
+                      <tr
+                        key={n.id}
+                        className={`border-b border-card-border hover:bg-card-border/30 transition-colors group border-l-4 ${sentimentBorderColor(s?.sentiment ?? null)}`}
+                      >
+                        <td className="py-3 px-5 text-on-surface-variant whitespace-nowrap">
+                          {n.published_at ? new Date(n.published_at).toLocaleDateString("ko-KR") : "—"}
+                        </td>
+                        <td className="py-3 px-5 whitespace-nowrap">
+                          <SentimentTag
+                            sentiment={s?.sentiment ?? null}
+                            impactScore={s?.impact_score}
+                            confidence={s?.confidence}
+                          />
+                        </td>
+                        <td className="py-3 px-5 text-on-surface group-hover:text-primary transition-colors">
+                          <a href={n.source_url} target="_blank" rel="noopener noreferrer">{n.title}</a>
+                        </td>
+                        <td className="py-3 px-5 text-on-surface-variant">{n.source_name ?? "—"}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

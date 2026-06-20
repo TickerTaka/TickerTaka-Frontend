@@ -19,22 +19,8 @@ export default function TopNavBar() {
         <span className="text-headline-sm text-primary font-bold">Ticker Taka</span>
       </Link>
       <div className="flex items-center gap-6">
-        <nav className="hidden lg:flex items-center gap-6">
-          <a className="text-on-surface-variant pb-2 font-label-md text-label-md hover:text-primary transition-colors">
-            Market Summary
-          </a>
-          <a className="text-on-surface-variant pb-2 font-label-md text-label-md hover:text-primary transition-colors">
-            Today&apos;s Issues
-          </a>
-          <a className="text-on-surface-variant pb-2 font-label-md text-label-md hover:text-primary transition-colors">
-            Recommended Debates
-          </a>
-        </nav>
         <div className="flex items-center gap-3">
           <ThemeToggleButton />
-          <button className="p-1.5 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
           <button className="p-1.5 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors">
             <span className="material-symbols-outlined">account_circle</span>
           </button>

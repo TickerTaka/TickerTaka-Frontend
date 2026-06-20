@@ -21,7 +21,15 @@ function fmtDateTime(iso: string): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export default function HistoryTable({ initialSessions }: { initialSessions: DebateSession[] }) {
+export default function HistoryTable({
+  initialSessions,
+  focusedSymbol = null,
+  focusedSymbolName = null,
+}: {
+  initialSessions: DebateSession[];
+  focusedSymbol?: string | null;
+  focusedSymbolName?: string | null;
+}) {
   const [sessions, setSessions] = useState(initialSessions);
   const [filter, setFilter] = useState<DebateCategory | "all">("all");
   const [search, setSearch] = useState("");
@@ -57,6 +65,21 @@ export default function HistoryTable({ initialSessions }: { initialSessions: Deb
         <div>
           <h2 className="text-headline-lg text-on-surface mb-2">리포트 히스토리</h2>
           <p className="text-body-md text-on-surface-variant">저장된 AI 토론 분석 결과 및 리포트 목록입니다.</p>
+          {focusedSymbol && (
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-label-md text-primary">
+              <span className="material-symbols-outlined text-[16px]">filter_alt</span>
+              <span>
+                <strong>{focusedSymbolName ?? focusedSymbol}</strong> 종목만 표시
+              </span>
+              <Link
+                href="/history"
+                className="ml-1 flex items-center justify-center w-5 h-5 rounded-full hover:bg-primary/20 transition-colors"
+                aria-label="전체 토론 보기"
+              >
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </Link>
+            </div>
+          )}
         </div>
         <div className="relative w-full md:w-[300px]">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">
