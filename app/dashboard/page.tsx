@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AddWatchlistCard from "@/components/stock/AddWatchlistCard";
 import WatchlistTable from "@/components/stock/WatchlistTable";
+import WatchlistRefreshButton from "@/components/stock/WatchlistRefreshButton";
 import SentimentTag, { sentimentBorderColor } from "@/components/stock/SentimentTag";
 import { listWatchlist } from "@/lib/api/watchlist";
 import { getDashboardStats, getWatchlistFeed } from "@/lib/api/market";
@@ -49,7 +50,10 @@ export default async function DashboardPage() {
               <h3 className="text-headline-sm text-on-surface">
                 관심 종목
               </h3>
-              <span className="text-label-sm text-on-surface-variant">{watchlist.length}건</span>
+              <div className="flex items-center gap-3">
+                <span className="text-label-sm text-on-surface-variant">{watchlist.length}건</span>
+                {watchlist.length > 0 && <WatchlistRefreshButton />}
+              </div>
             </div>
             {watchlistError && <div className="p-4 text-body-sm text-error">{watchlistError}</div>}
             {!watchlistError && <WatchlistTable initialItems={watchlist} />}

@@ -1,13 +1,15 @@
-import { DEFAULT_USER_ID, apiGet, isMockMode } from "@/lib/api/client";
+import { DEFAULT_USER_ID, apiGet, apiPost, isMockMode } from "@/lib/api/client";
 import type {
   DashboardStats,
   FilingItem,
   MarketIndexItem,
   NewsItem,
+  QuoteResponse,
   StockDetail,
   StockPrices,
   TickerSearchItem,
   WatchlistFeedItem,
+  WatchlistRefreshResponse,
 } from "@/lib/types/market";
 
 interface Wrapped<T> {
@@ -24,6 +26,38 @@ export async function searchTickers(q = "", limit = 20): Promise<TickerSearchIte
 
 export async function getStockDetail(symbol: string): Promise<StockDetail> {
   return apiGet<StockDetail>(`/api/stocks/${encodeURIComponent(symbol)}`);
+}
+
+// 지연 현재가 (yfinance + Redis 캐시). 일봉이 아닌 "지금" 가격이 필요할 때.
+export async function getStockQuote(symbol: string): Promise<QuoteResponse> {
+  return apiGet<QuoteResponse>(`/api/stocks/${encodeURIComponent(symbol)}/quote`);
+}
+
+// 관심종목 전체 새로고침 (비차단). throttle 윈도우 안 종목은 skipped로 반환.
+export async function refreshWatchlist(
+  userId: string = DEFAULT_USER_ID,
+): Promise<WatchlistRefreshResponse> {
+  if (isMockMode()) {
+    return { status: "refreshing", symbols: [], skipped: [] };
+  }
+  return apiPost<Record<string, never>, WatchlistRefreshResponse>(
+    `/api/watchlists/${userId}/refresh`,
+    {} as Record<string, never>,
+  );
+}
+
+// 관심종목 한 개만 새로고침.
+export async function refreshWatchlistSymbol(
+  symbol: string,
+  userId: string = DEFAULT_USER_ID,
+): Promise<WatchlistRefreshResponse> {
+  if (isMockMode()) {
+    return { status: "refreshing", symbols: [symbol], skipped: [] };
+  }
+  return apiPost<Record<string, never>, WatchlistRefreshResponse>(
+    `/api/watchlists/${userId}/${encodeURIComponent(symbol)}/refresh`,
+    {} as Record<string, never>,
+  );
 }
 
 export async function getStockPrices(symbol: string, limit = 260): Promise<StockPrices> {

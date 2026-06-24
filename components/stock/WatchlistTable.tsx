@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteWatchlist } from "@/lib/api/watchlist";
-import { getStockDetail } from "@/lib/api/market";
+import { getStockDetail, getStockQuote } from "@/lib/api/market";
 import type { WatchlistItem } from "@/lib/types/watchlist";
 
 function fmtDate(iso: string): string {
@@ -16,6 +16,7 @@ interface PriceInfo {
   close: number | null;
   changeRate: number | null;
   date: string | null;
+  isDelayed?: boolean;
 }
 
 export default function WatchlistTable({
@@ -30,26 +31,48 @@ export default function WatchlistTable({
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 페이지 로딩 차단 없이, 마운트 후 가격을 비동기 병렬로 받아온다.
-  // 종목별 응답이 도착할 때마다 setState — 빠르게 들어오는 순서대로 채워짐.
+  // 페이지 로딩 차단 없이, 마운트 후 지연 현재가(quote API)를 병렬로 받아온다.
+  // 백엔드는 Redis 캐시(장중 5분/장외 30분)라 빠르게 응답하지만, yfinance가
+  // 429 rate-limit으로 실패하는 일이 있어서 그땐 일봉 종가(getStockDetail)로 fallback.
   useEffect(() => {
     let cancelled = false;
     items.forEach((w) => {
-      getStockDetail(w.symbol)
-        .then((d) => {
+      getStockQuote(w.symbol)
+        .then((q) => {
           if (cancelled) return;
-          const p = d.latest_price;
           setPriceBySymbol((prev) => ({
             ...prev,
             [w.symbol]: {
-              close: p?.close ?? null,
-              changeRate: p?.change_rate ?? null,
-              date: p?.date ?? null,
+              close: q.price ?? null,
+              changeRate: q.change_rate ?? null,
+              date: q.ts ?? null,
+              isDelayed: q.is_delayed,
             },
           }));
         })
         .catch(() => {
-          /* 한 종목 실패해도 다른 건 계속 채워짐 */
+          // quote 실패 → 일봉 종가 fallback. 이것마저 실패하면 "—" 표시.
+          getStockDetail(w.symbol)
+            .then((d) => {
+              if (cancelled) return;
+              const p = d.latest_price;
+              setPriceBySymbol((prev) => ({
+                ...prev,
+                [w.symbol]: {
+                  close: p?.close ?? null,
+                  changeRate: p?.change_rate ?? null,
+                  date: p?.date ?? null,
+                  isDelayed: true,
+                },
+              }));
+            })
+            .catch(() => {
+              if (cancelled) return;
+              setPriceBySymbol((prev) => ({
+                ...prev,
+                [w.symbol]: { close: null, changeRate: null, date: null },
+              }));
+            });
         });
     });
     return () => {
