@@ -141,3 +141,25 @@ export interface DebateListItem {
   completed_at: string | null;
   summary_content: string | null;
 }
+
+// 백엔드 /api/stocks/{symbol}/quote — yfinance 기반 지연 현재가 스냅샷.
+// Redis TTL: 장중 5분 / 장외 30분 / 주말 24h. is_delayed=true면 ~15분 지연 라벨 권장.
+export interface QuoteResponse {
+  symbol: string;
+  price: number;
+  prev_close: number | null;
+  change: number | null;
+  change_rate: number | null;
+  volume: number | null;
+  source: string;
+  is_delayed: boolean;
+  ts: string;
+}
+
+// 백엔드 /api/watchlists/{user_id}/refresh — 비차단 새로고침 응답.
+// 실제 sync는 백그라운드로 진행, 즉시 어떤 종목이 큐잉됐는지/스킵됐는지 알려준다.
+export interface WatchlistRefreshResponse {
+  status: string;
+  symbols: string[];
+  skipped: string[];
+}
